@@ -1,6 +1,18 @@
 # BizBuddy AI
 
-[![Presentation](https://img.shields.io/badge/View%20Presentation-Live%20Demo-22c55e?style=for-the-badge)](https://venkatacharan22.github.io/bizbuddy-presentation/)
+<div align="center">
+
+## 🚀 [VIEW FULL PROJECT PRESENTATION →](https://venkatacharan22.github.io/bizbuddy-presentation/)
+
+> **Click above to see architecture diagrams, agent flow, API endpoints, and full tech breakdown**
+
+[![Presentation](https://img.shields.io/badge/📊%20Architecture%20Diagrams-View%20Now-22c55e?style=for-the-badge&logoColor=white)](https://venkatacharan22.github.io/bizbuddy-presentation/)
+[![Stack](https://img.shields.io/badge/Tech%20Stack-React%20%2B%20FastAPI%20%2B%20Gemini-38bdf8?style=for-the-badge)](https://venkatacharan22.github.io/bizbuddy-presentation/)
+[![AI](https://img.shields.io/badge/AI%20Features-15%20Powered%20by%20Llama%203.3-f472b6?style=for-the-badge)](https://venkatacharan22.github.io/bizbuddy-presentation/)
+
+---
+
+</div>
 
 AI-powered inventory and business management app for small shopkeepers. Mobile-first PWA with OCR, AI chat, and smart analytics.
 
