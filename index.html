@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BizBuddy AI — Project Presentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c0a;
+    --surface: #0d1410;
+    --surface2: #111a14;
+    --border: #1e2e22;
+    --green: #22c55e;
+    --green-dim: #16a34a;
+    --green-glow: rgba(34,197,94,0.15);
+    --green-faint: rgba(34,197,94,0.06);
+    --amber: #f59e0b;
+    --blue: #38bdf8;
+    --pink: #f472b6;
+    --text: #e8f5ec;
+    --muted: #6b8a72;
+    --muted2: #4a6651;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Instrument Sans', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* NOISE TEXTURE */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* GRID BACKGROUND */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(34,197,94,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,197,94,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  section, nav, footer { position: relative; z-index: 1; }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(8,12,10,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--green);
+    letter-spacing: -0.02em;
+  }
+
+  .nav-logo span { color: var(--muted); }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-family: 'DM Mono', monospace;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--green); }
+
+  .nav-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--green);
+    border: 1px solid var(--green-dim);
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--green-faint);
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--green);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: var(--green-faint);
+    margin-bottom: 32px;
+    display: inline-block;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 .accent { color: var(--green); }
+  .hero h1 .dim { color: var(--muted2); }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 560px;
+    margin: 0 auto 48px;
+    line-height: 1.7;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+
+  .hero-stat .num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--green);
+    line-height: 1;
+  }
+
+  .hero-stat .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 100px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--green);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 200px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 600px;
+    margin-bottom: 64px;
+    line-height: 1.7;
+  }
+
+  /* TECH STACK */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .stack-item {
+    background: var(--surface);
+    padding: 28px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stack-item:hover { background: var(--surface2); }
+
+  .stack-item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--green);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .stack-item:hover::before { opacity: 1; }
+
+  .stack-layer {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+
+  .stack-tech {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .stack-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ARCHITECTURE DIAGRAM */
+  .arch-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .arch-diagram::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, var(--green-glow), transparent 60%);
+    pointer-events: none;
+  }
+
+  .arch-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .arch-layer {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    background: var(--surface2);
+    position: relative;
+  }
+
+  .arch-layer-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+  }
+
+  .arch-boxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .arch-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .arch-box:hover {
+    border-color: var(--green-dim);
+    color: var(--green);
+  }
+
+  .arch-box.ai {
+    border-color: rgba(34,197,94,0.3);
+    color: var(--green);
+    background: var(--green-faint);
+  }
+
+  .arch-box.amber {
+    border-color: rgba(245,158,11,0.3);
+    color: var(--amber);
+    background: rgba(245,158,11,0.05);
+  }
+
+  .arch-box.blue {
+    border-color: rgba(56,189,248,0.3);
+    color: var(--blue);
+    background: rgba(56,189,248,0.05);
+  }
+
+  .arch-arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    color: var(--muted2);
+    font-size: 1.2rem;
+    position: relative;
+  }
+
+  .arch-arrow::before, .arch-arrow::after {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 16px;
+    background: var(--border);
+    left: 50%;
+  }
+  .arch-arrow::before { top: 0; }
+  .arch-arrow::after { bottom: 0; }
+
+  /* FLOW DIAGRAM */
+  .flow-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .flow-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 28px;
+    text-align: center;
+    min-width: 220px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .flow-node:hover { border-color: var(--green-dim); }
+
+  .flow-node.start {
+    border-color: var(--green-dim);
+    background: var(--green-faint);
+  }
+
+  .flow-node.decision {
+    border-color: rgba(245,158,11,0.4);
+    background: rgba(245,158,11,0.05);
+    clip-path: none;
+    border-radius: 4px;
+    transform: rotate(0deg);
+  }
+
+  .flow-node.action {
+    border-color: rgba(56,189,248,0.3);
+    background: rgba(56,189,248,0.05);
+  }
+
+  .flow-node.ai-node {
+    border-color: var(--green-dim);
+    background: var(--green-faint);
+  }
+
+  .flow-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .flow-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .flow-arrow {
+    width: 1px;
+    height: 36px;
+    background: var(--border);
+    position: relative;
+    margin: 0 auto;
+  }
+
+  .flow-arrow::after {
+    content: '▼';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--muted2);
+    font-size: 0.6rem;
+  }
+
+  .flow-branch {
+    display: flex;
+    gap: 64px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .flow-branch-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .branch-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+
+  /* AGENT LOOP */
+  .agent-loop {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .agent-loop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 50%, rgba(34,197,94,0.08), transparent 60%);
+    pointer-events: none;
+  }
+
+  .agent-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .agent-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .agent-step:last-child { border-bottom: none; }
+
+  .agent-step-num {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    background: var(--surface2);
+    margin-top: 2px;
+  }
+
+  .agent-step.active .agent-step-num {
+    border-color: var(--green-dim);
+    color: var(--green);
+    background: var(--green-faint);
+  }
+
+  .agent-step-content { flex: 1; }
+
+  .agent-step-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+
+  .agent-step.active .agent-step-title { color: var(--green); }
+
+  .agent-step-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .agent-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .tool-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .tool-card:hover {
+    border-color: var(--green-dim);
+    transform: translateY(-2px);
+  }
+
+  .tool-icon {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+
+  .tool-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+
+  .tool-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* ENDPOINTS TABLE */
+  .endpoints-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  .endpoints-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .endpoints-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    background: var(--surface2);
+  }
+
+  .endpoints-table tr:hover td { background: var(--surface); }
+
+  .method-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .get { background: rgba(56,189,248,0.1); color: var(--blue); border: 1px solid rgba(56,189,248,0.2); }
+  .post { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+  .ai-badge { background: rgba(244,114,182,0.1); color: var(--pink); border: 1px solid rgba(244,114,182,0.2); font-family: 'DM Mono', monospace; font-size: 0.62rem; padding: 2px 6px; border-radius: 4px; }
+
+  /* DB SCHEMA */
+  .schema-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+  }
+
+  .schema-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .schema-table-header {
+    background: var(--surface2);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .schema-table-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .schema-table-path {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  .schema-fields { padding: 8px 0; }
+
+  .schema-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 20px;
+    border-bottom: 1px solid rgba(30,46,34,0.5);
+  }
+
+  .schema-field:last-child { border-bottom: none; }
+
+  .field-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text);
+  }
+
+  .field-type {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--amber);
+  }
+
+  /* USER FLOW */
+  .userflow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding: 8px 0 24px;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .uf-step {
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    min-width: 160px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+
+  .uf-step:hover { border-color: var(--green-dim); }
+
+  .uf-step.highlight {
+    border-color: var(--green-dim);
+    background: var(--green-faint);
+  }
+
+  .uf-step-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .uf-step-icon { font-size: 1.4rem; margin-bottom: 8px; }
+
+  .uf-step-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+  }
+
+  .uf-step-desc {
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .uf-arrow {
+    font-size: 1rem;
+    color: var(--muted2);
+    padding: 0 12px;
+    flex-shrink: 0;
+  }
+
+  /* FEATURES GRID */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .feature-card:hover {
+    border-color: var(--green-dim);
+    transform: translateY(-3px);
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle at top right, var(--green-glow), transparent 70%);
+    pointer-events: none;
+  }
+
+  .feature-icon {
+    font-size: 1.8rem;
+    margin-bottom: 16px;
+  }
+
+  .feature-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  .feature-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 48px;
+    text-align: center;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero > * {
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero > *:nth-child(2) { animation-delay: 0.2s; }
+  .hero > *:nth-child(3) { animation-delay: 0.3s; }
+  .hero > *:nth-child(4) { animation-delay: 0.4s; }
+  .hero > *:nth-child(5) { animation-delay: 0.5s; }
+
+  /* PULSE */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .live-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+    margin-right: 6px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    section { padding: 64px 20px; }
+    .hero { padding: 100px 20px 60px; }
+    .hero-stats { gap: 24px; }
+    .arch-diagram { padding: 24px; }
+    .agent-loop { padding: 24px; }
+    .divider { margin: 0 20px; }
+    footer { padding: 32px 20px; }
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">BizBuddy<span>.AI</span></div>
+  <ul class="nav-links">
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#userflow">User Flow</a></li>
+    <li><a href="#agent">Agent</a></li>
+    <li><a href="#endpoints">Endpoints</a></li>
+    <li><a href="#database">Database</a></li>
+  </ul>
+  <div class="nav-badge"><span class="live-dot"></span>Llama 3.3 70B</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-tag">CAUSE2025 · Enterprising City · BizBuddy AI</div>
+  <h1>
+    <span class="dim">Smart</span> Inventory<br>
+    <span class="accent">& AI</span> <span class="dim">for</span> Shops
+  </h1>
+  <p class="hero-sub">
+    An agentic AI-powered PWA that empowers Indian small shopkeepers with voice-first inventory, OCR bill scanning, real-time analytics, and a Llama-powered business assistant.
+  </p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="num">28</div>
+      <div class="label">API Endpoints</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">15</div>
+      <div class="label">AI-Powered</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">8</div>
+      <div class="label">Agent Tools</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">8</div>
+      <div class="label">App Pages</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TECH STACK -->
+<section id="stack">
+  <div class="section-label">01 · Tech Stack</div>
+  <h2 class="section-title">Built with the right tools</h2>
+  <p class="section-desc">A lean, production-ready stack optimized for mobile-first PWA performance with real AI at the core.</p>
+
+  <div class="stack-grid">
+    <div class="stack-item">
+      <div class="stack-layer">Frontend</div>
+      <div class="stack-tech">React 18 + Vite</div>
+      <div class="stack-desc">Tailwind CSS, Recharts, Lucide Icons, PWA with service worker</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-layer">Backend</div>
+      <div class="stack-tech">FastAPI (Python)</div>
+      <div class="stack-desc">28 endpoints, async routes, SSE streaming, Uvicorn</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-layer">AI / LLM</div>
+      <div class="stack-tech">Groq + Llama 3.3 70B</div>
+      <div class="stack-desc">Tool-calling agent loop, 15 AI features, function definitions</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-layer">Database</div>
+      <div class="stack-tech">Firebase Firestore</div>
+      <div class="stack-desc">Per-user isolation, real-time onSnapshot, 4 collections</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-layer">Auth</div>
+      <div class="stack-tech">Firebase Auth</div>
+      <div class="stack-desc">Google OAuth, email/password, session persistence</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-layer">OCR</div>
+      <div class="stack-tech">Tesseract</div>
+      <div class="stack-desc">pytesseract + Pillow, extracts text from bill photos</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-layer">Streaming</div>
+      <div class="stack-tech">SSE via fetch</div>
+      <div class="stack-desc">ReadableStream for POST SSE, real-time agent step display</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-layer">Voice</div>
+      <div class="stack-tech">Web Speech API</div>
+      <div class="stack-desc">Browser-native, no cost, Hindi + English, AI parsing</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <div class="section-label">02 · Architecture</div>
+  <h2 class="section-title">System architecture</h2>
+  <p class="section-desc">A three-tier architecture with real-time Firebase sync and a streaming agentic AI layer.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-layers">
+
+      <div class="arch-layer">
+        <div class="arch-layer-title">📱 Frontend — React PWA (Mobile-First)</div>
+        <div class="arch-boxes">
+          <div class="arch-box">AuthPage</div>
+          <div class="arch-box">OnboardingPage</div>
+          <div class="arch-box">AISetupPage</div>
+          <div class="arch-box">DashboardPage</div>
+          <div class="arch-box">InventoryPage</div>
+          <div class="arch-box">ChatPage</div>
+          <div class="arch-box">AnalyticsPage</div>
+          <div class="arch-box">PosterPage</div>
+        </div>
+        <div style="margin-top:12px;">
+          <div class="arch-boxes">
+            <div class="arch-box blue">useAuth</div>
+            <div class="arch-box blue">useProducts</div>
+            <div class="arch-box blue">useAgentChat</div>
+            <div class="arch-box blue">useVoiceInput</div>
+            <div class="arch-box blue">useRentals</div>
+            <div class="arch-box blue">useNotifications</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-arrow">↕</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-title">⚡ Transport Layer</div>
+        <div class="arch-boxes">
+          <div class="arch-box amber">Firebase Auth (Google OAuth)</div>
+          <div class="arch-box amber">Axios REST → FastAPI</div>
+          <div class="arch-box amber">fetch + ReadableStream SSE</div>
+          <div class="arch-box amber">Firestore onSnapshot (realtime)</div>
+        </div>
+      </div>
+
+      <div class="arch-arrow">↕</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-title">🔧 Backend — FastAPI (Python)</div>
+        <div class="arch-boxes">
+          <div class="arch-box">19 Route Modules</div>
+          <div class="arch-box ai">Agent System (SSE)</div>
+          <div class="arch-box">Inventory CRUD</div>
+          <div class="arch-box">Transactions</div>
+          <div class="arch-box">Rentals</div>
+          <div class="arch-box">Analytics</div>
+          <div class="arch-box ai">Groq Service</div>
+          <div class="arch-box">Firebase Service</div>
+          <div class="arch-box">OCR (Tesseract)</div>
+        </div>
+      </div>
+
+      <div class="arch-arrow">↕</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-title">🗄️ Data & AI Layer</div>
+        <div class="arch-boxes">
+          <div class="arch-box blue">Firestore — products</div>
+          <div class="arch-box blue">Firestore — transactions</div>
+          <div class="arch-box blue">Firestore — rentals</div>
+          <div class="arch-box blue">Firestore — settings</div>
+          <div class="arch-box ai">Groq API — Llama 3.3 70B</div>
+          <div class="arch-box amber">Pexels API — images</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- USER FLOW -->
+<section id="userflow">
+  <div class="section-label">03 · User Flow</div>
+  <h2 class="section-title">End-to-end user journey</h2>
+  <p class="section-desc">From first open to daily operations — a guided onboarding that gets shopkeepers running in minutes.</p>
+
+  <div class="userflow">
+    <div class="uf-step highlight">
+      <div class="uf-step-num">step 01</div>
+      <div class="uf-step-icon">📱</div>
+      <div class="uf-step-name">Open App</div>
+      <div class="uf-step-desc">PWA loads, checks Firebase Auth session</div>
+    </div>
+    <div class="uf-arrow">→</div>
+    <div class="uf-step">
+      <div class="uf-step-num">step 02</div>
+      <div class="uf-step-icon">🔐</div>
+      <div class="uf-step-name">Login</div>
+      <div class="uf-step-desc">Google OAuth or Email/Password via Firebase</div>
+    </div>
+    <div class="uf-arrow">→</div>
+    <div class="uf-step">
+      <div class="uf-step-num">step 03</div>
+      <div class="uf-step-icon">🏪</div>
+      <div class="uf-step-name">Onboarding</div>
+      <div class="uf-step-desc">Select business type from 10 categories</div>
+    </div>
+    <div class="uf-arrow">→</div>
+    <div class="uf-step highlight">
+      <div class="uf-step-num">step 04</div>
+      <div class="uf-step-icon">🤖</div>
+      <div class="uf-step-name">AI Setup</div>
+      <div class="uf-step-desc">AI generates 18 starter products + insights via /setup-shop</div>
+    </div>
+    <div class="uf-arrow">→</div>
+    <div class="uf-step">
+      <div class="uf-step-num">step 05</div>
+      <div class="uf-step-icon">📊</div>
+      <div class="uf-step-name">Dashboard</div>
+      <div class="uf-step-desc">Real-time stats, AI restock tips, demand forecast</div>
+    </div>
+    <div class="uf-arrow">→</div>
+    <div class="uf-step">
+      <div class="uf-step-num">daily</div>
+      <div class="uf-step-icon">📦</div>
+      <div class="uf-step-name">Manage</div>
+      <div class="uf-step-desc">Swipe to sell/rent, voice input, OCR bills</div>
+    </div>
+    <div class="uf-arrow">→</div>
+    <div class="uf-step highlight">
+      <div class="uf-step-num">daily</div>
+      <div class="uf-step-icon">💬</div>
+      <div class="uf-step-name">Ask AI</div>
+      <div class="uf-step-desc">Agentic chat answers questions using live data</div>
+    </div>
+  </div>
+
+  <!-- SALE FLOW -->
+  <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;margin: 48px 0 24px;letter-spacing:-0.02em;">Sale Transaction Flow</h3>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;flex-wrap:wrap;">
+    <div class="arch-diagram" style="padding:32px;">
+      <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--green);margin-bottom:20px;text-transform:uppercase;letter-spacing:0.1em;">💸 Sell Flow</div>
+      <div class="agent-steps">
+        <div class="agent-step active">
+          <div class="agent-step-num">1</div>
+          <div class="agent-step-content">
+            <div class="agent-step-title">Swipe Product Left</div>
+            <div class="agent-step-desc">SwipeableProductCard reveals Sell / Rent / AI Price</div>
+          </div>
+        </div>
+        <div class="agent-step">
+          <div class="agent-step-num">2</div>
+          <div class="agent-step-content">
+            <div class="agent-step-title">SellModal Opens</div>
+            <div class="agent-step-desc">Enter quantity + optional customer name</div>
+          </div>
+        </div>
+        <div class="agent-step">
+          <div class="agent-step-num">3</div>
+          <div class="agent-step-content">
+            <div class="agent-step-title">POST /sell</div>
+            <div class="agent-step-desc">Validates stock, deducts qty, creates transaction record</div>
+          </div>
+        </div>
+        <div class="agent-step active">
+          <div class="agent-step-num">4</div>
+          <div class="agent-step-content">
+            <div class="agent-step-title">Firestore onSnapshot</div>
+            <div class="agent-step-desc">useProducts updates → UI re-renders instantly</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-diagram" style="padding:32px;">
+      <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--amber);margin-bottom:20px;text-transform:uppercase;letter-spacing:0.1em;">📦 Rental Flow</div>
+      <div class="agent-steps">
+        <div class="agent-step active">
+          <div class="agent-step-num">1</div>
+          <div class="agent-step-content">
+            <div class="agent-step-title">Swipe → Rent</div>
+            <div class="agent-step-desc">RentModal: qty + customer + return date</div>
+          </div>
+        </div>
+        <div class="agent-step">
+          <div class="agent-step-num">2</div>
+          <div class="agent-step-content">
+            <div class="agent-step-title">POST /rent</div>
+            <div class="agent-step-desc">Deducts stock, creates rental (status: active)</div>
+          </div>
+        </div>
+        <div class="agent-step">
+          <div class="agent-step-num">3</div>
+          <div class="agent-step-content">
+            <div class="agent-step-title">Live Countdown</div>
+            <div class="agent-step-desc">RentalCountdown ticks every second, color-coded urgency</div>
+          </div>
+        </div>
+        <div class="agent-step active">
+          <div class="agent-step-num">4</div>
+          <div class="agent-step-content">
+            <div class="agent-step-title">Return → Stock Restored</div>
+            <div class="agent-step-desc">POST /return-rental → status: returned, qty back</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- AGENT SYSTEM -->
+<section id="agent">
+  <div class="section-label">04 · Agentic AI</div>
+  <h2 class="section-title">The agent loop</h2>
+  <p class="section-desc">Llama 3.3 70B autonomously decides which tools to call, chains lookups, and streams results in real-time via SSE.</p>
+
+  <div class="agent-loop">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--green);margin-bottom:20px;text-transform:uppercase;letter-spacing:0.1em;">Agent execution flow (max 5 iterations)</div>
+        <div class="agent-steps">
+          <div class="agent-step active">
+            <div class="agent-step-num">1</div>
+            <div class="agent-step-content">
+              <div class="agent-step-title">User sends message</div>
+              <div class="agent-step-desc">POST /agent/chat — full conversation history + business type sent</div>
+            </div>
+          </div>
+          <div class="agent-step active">
+            <div class="agent-step-num">2</div>
+            <div class="agent-step-content">
+              <div class="agent-step-title">Groq LLM decides</div>
+              <div class="agent-step-desc">Llama 3.3 70B with tool_choice: "auto" — picks 0 to N tools</div>
+            </div>
+          </div>
+          <div class="agent-step">
+            <div class="agent-step-num">3</div>
+            <div class="agent-step-content">
+              <div class="agent-step-title">Tool execution</div>
+              <div class="agent-step-desc">Streams "status" event → queries Firestore → streams "tool_result"</div>
+            </div>
+          </div>
+          <div class="agent-step">
+            <div class="agent-step-num">4</div>
+            <div class="agent-step-content">
+              <div class="agent-step-title">Result fed back</div>
+              <div class="agent-step-desc">Tool output appended to conversation, loop continues</div>
+            </div>
+          </div>
+          <div class="agent-step active">
+            <div class="agent-step-num">5</div>
+            <div class="agent-step-content">
+              <div class="agent-step-title">Final response</div>
+              <div class="agent-step-desc">Streams "message" event with formatted text → "done" event closes stream</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:24px;padding:16px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);">
+          <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);margin-bottom:8px;">SSE Event Types</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <div class="arch-box ai">status</div>
+            <div class="arch-box ai">tool_result</div>
+            <div class="arch-box ai">message</div>
+            <div class="arch-box ai">error</div>
+            <div class="arch-box ai">done</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--green);margin-bottom:20px;text-transform:uppercase;letter-spacing:0.1em;">8 Available Tools</div>
+        <div class="agent-tools-grid">
+          <div class="tool-card">
+            <div class="tool-icon">📦</div>
+            <div class="tool-name">get_inventory</div>
+            <div class="tool-desc">All products for the user from Firestore</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-icon">⚠️</div>
+            <div class="tool-name">get_low_stock</div>
+            <div class="tool-desc">Products where qty ≤ threshold</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-icon">📊</div>
+            <div class="tool-name">get_sales_analytics</div>
+            <div class="tool-desc">Last 200 transactions summary</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-icon">🧾</div>
+            <div class="tool-name">get_recent_transactions</div>
+            <div class="tool-desc">Recent sales with optional limit</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-icon">📈</div>
+            <div class="tool-name">get_demand_forecast</div>
+            <div class="tool-desc">7-day AI demand predictions</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-icon">🔄</div>
+            <div class="tool-name">get_restock_recs</div>
+            <div class="tool-desc">AI restock recommendations</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-icon">📋</div>
+            <div class="tool-name">get_business_report</div>
+            <div class="tool-desc">Health score + AI summary</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-icon">💰</div>
+            <div class="tool-name">record_sale</div>
+            <div class="tool-desc">Write sale to Firestore via chat</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ENDPOINTS -->
+<section id="endpoints">
+  <div class="section-label">05 · API Endpoints</div>
+  <h2 class="section-title">All 28 endpoints</h2>
+  <p class="section-desc">15 of 28 endpoints call Groq/Llama 3.3 70B. Each AI route has proper error handling and fallback responses.</p>
+
+  <div style="overflow-x:auto;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+    <table class="endpoints-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Method</th>
+          <th>Path</th>
+          <th>AI</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td><span class="method-badge get">GET</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/inventory</td><td>—</td><td>List all products for user</td></tr>
+        <tr><td>2</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/inventory</td><td>—</td><td>Add new product</td></tr>
+        <tr><td>3</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/sell</td><td>—</td><td>Record a sale, deduct stock</td></tr>
+        <tr><td>4</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/rent</td><td>—</td><td>Record a rental, deduct stock</td></tr>
+        <tr><td>5</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/return-rental</td><td>—</td><td>Return rental, restore stock</td></tr>
+        <tr><td>6</td><td><span class="method-badge get">GET</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/rentals</td><td>—</td><td>Active rentals list</td></tr>
+        <tr><td>7</td><td><span class="method-badge get">GET</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/transactions</td><td>—</td><td>Sales history</td></tr>
+        <tr><td>8</td><td><span class="method-badge get">GET</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/export</td><td>—</td><td>CSV export of all data</td></tr>
+        <tr><td>9</td><td><span class="method-badge get">GET</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/analytics</td><td>—</td><td>Sales summary + stats</td></tr>
+        <tr><td>10</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/chat</td><td><span class="ai-badge">AI</span></td><td>Simple single-turn chat</td></tr>
+        <tr><td>11</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/agent/chat</td><td><span class="ai-badge">AI</span></td><td>Agentic chat — SSE stream</td></tr>
+        <tr><td>12</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/setup-shop</td><td><span class="ai-badge">AI</span></td><td>Generate starter inventory + insights</td></tr>
+        <tr><td>13</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/suggest-products</td><td><span class="ai-badge">AI</span></td><td>Product recommendations for business type</td></tr>
+        <tr><td>14</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/daily-insight</td><td><span class="ai-badge">AI</span></td><td>Daily business tip</td></tr>
+        <tr><td>15</td><td><span class="method-badge get">GET</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/demand-forecast</td><td><span class="ai-badge">AI</span></td><td>7-day demand prediction</td></tr>
+        <tr><td>16</td><td><span class="method-badge get">GET</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/smart-restock</td><td><span class="ai-badge">AI</span></td><td>Restock recommendations</td></tr>
+        <tr><td>17</td><td><span class="method-badge get">GET</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/business-report</td><td><span class="ai-badge">AI</span></td><td>Health score + business summary</td></tr>
+        <tr><td>18</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/optimize-price</td><td><span class="ai-badge">AI</span></td><td>AI price suggestion for product</td></tr>
+        <tr><td>19</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/auto-categorize</td><td><span class="ai-badge">AI</span></td><td>Auto-fill category, price, threshold</td></tr>
+        <tr><td>20</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/voice-parse</td><td><span class="ai-badge">AI</span></td><td>Parse natural spoken input</td></tr>
+        <tr><td>21</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/ocr</td><td><span class="ai-badge">AI</span></td><td>Extract items from bill photo</td></tr>
+        <tr><td>22</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/image-recognize</td><td><span class="ai-badge">AI</span></td><td>Identify product from image</td></tr>
+        <tr><td>23</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/poster</td><td><span class="ai-badge">AI</span></td><td>Generate promotional poster text</td></tr>
+        <tr><td>24</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/festival-insights</td><td><span class="ai-badge">AI</span></td><td>Festival-based stock tips + notifications</td></tr>
+        <tr><td>25</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/product-image</td><td><span class="ai-badge">AI</span></td><td>Fetch product image via Pexels</td></tr>
+        <tr><td>26</td><td><span class="method-badge get">GET</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/</td><td>—</td><td>Health check</td></tr>
+        <tr><td>27</td><td><span class="method-badge get">GET</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/health</td><td>—</td><td>Health check</td></tr>
+        <tr><td>28</td><td><span class="method-badge post">POST</span></td><td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">/ocr/base64</td><td><span class="ai-badge">AI</span></td><td>OCR from base64 image</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- DATABASE -->
+<section id="database">
+  <div class="section-label">06 · Database Schema</div>
+  <h2 class="section-title">Firestore collections</h2>
+  <p class="section-desc">Per-user data isolation under users/{userId}/. Real-time sync via onSnapshot listeners.</p>
+
+  <div class="schema-grid">
+    <div class="schema-table">
+      <div class="schema-table-header">
+        <div>
+          <div class="schema-table-name">products</div>
+          <div class="schema-table-path">users/{uid}/products/{id}</div>
+        </div>
+      </div>
+      <div class="schema-fields">
+        <div class="schema-field"><span class="field-name">name</span><span class="field-type">string</span></div>
+        <div class="schema-field"><span class="field-name">category</span><span class="field-type">string</span></div>
+        <div class="schema-field"><span class="field-name">quantity</span><span class="field-type">number</span></div>
+        <div class="schema-field"><span class="field-name">price</span><span class="field-type">number ₹</span></div>
+        <div class="schema-field"><span class="field-name">threshold</span><span class="field-type">number</span></div>
+        <div class="schema-field"><span class="field-name">image</span><span class="field-type">string</span></div>
+        <div class="schema-field"><span class="field-name">createdAt</span><span class="field-type">timestamp</span></div>
+        <div class="schema-field"><span class="field-name">updatedAt</span><span class="field-type">timestamp</span></div>
+      </div>
+    </div>
+
+    <div class="schema-table">
+      <div class="schema-table-header">
+        <div>
+          <div class="schema-table-name">transactions</div>
+          <div class="schema-table-path">users/{uid}/transactions/{id}</div>
+        </div>
+      </div>
+      <div class="schema-fields">
+        <div class="schema-field"><span class="field-name">type</span><span class="field-type">"sale"</span></div>
+        <div class="schema-field"><span class="field-name">productId</span><span class="field-type">string</span></div>
+        <div class="schema-field"><span class="field-name">productName</span><span class="field-type">string</span></div>
+        <div class="schema-field"><span class="field-name">category</span><span class="field-type">string</span></div>
+        <div class="schema-field"><span class="field-name">quantity</span><span class="field-type">number</span></div>
+        <div class="schema-field"><span class="field-name">pricePerUnit</span><span class="field-type">number ₹</span></div>
+        <div class="schema-field"><span class="field-name">totalAmount</span><span class="field-type">number ₹</span></div>
+        <div class="schema-field"><span class="field-name">createdAt</span><span class="field-type">timestamp</span></div>
+      </div>
+    </div>
+
+    <div class="schema-table">
+      <div class="schema-table-header">
+        <div>
+          <div class="schema-table-name">rentals</div>
+          <div class="schema-table-path">users/{uid}/rentals/{id}</div>
+        </div>
+      </div>
+      <div class="schema-fields">
+        <div class="schema-field"><span class="field-name">productId</span><span class="field-type">string</span></div>
+        <div class="schema-field"><span class="field-name">productName</span><span class="field-type">string</span></div>
+        <div class="schema-field"><span class="field-name">quantity</span><span class="field-type">number</span></div>
+        <div class="schema-field"><span class="field-name">customerName</span><span class="field-type">string?</span></div>
+        <div class="schema-field"><span class="field-name">returnDate</span><span class="field-type">timestamp</span></div>
+        <div class="schema-field"><span class="field-name">status</span><span class="field-type">"active"|"returned"</span></div>
+        <div class="schema-field"><span class="field-name">createdAt</span><span class="field-type">timestamp</span></div>
+        <div class="schema-field"><span class="field-name">returnedAt</span><span class="field-type">timestamp?</span></div>
+      </div>
+    </div>
+
+    <div class="schema-table">
+      <div class="schema-table-header">
+        <div>
+          <div class="schema-table-name">settings</div>
+          <div class="schema-table-path">users/{uid}/settings/ai_setup</div>
+        </div>
+      </div>
+      <div class="schema-fields">
+        <div class="schema-field"><span class="field-name">business_insights</span><span class="field-type">array</span></div>
+        <div class="schema-field"><span class="field-name">welcome_message</span><span class="field-type">string</span></div>
+        <div class="schema-field"><span class="field-name">tips</span><span class="field-type">string[]</span></div>
+        <div class="schema-field"><span class="field-name">ai_greeting</span><span class="field-type">string</span></div>
+        <div class="schema-field"><span class="field-name">createdAt</span><span class="field-type">timestamp</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- KEY FEATURES -->
+<section id="features">
+  <div class="section-label">07 · Key Features</div>
+  <h2 class="section-title">What makes it work</h2>
+  <p class="section-desc">Every feature is designed for shopkeepers with limited digital literacy — simple, fast, and offline-capable.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🎤</div>
+      <div class="feature-title">Voice-First Input</div>
+      <div class="feature-desc">Web Speech API for hands-free product entry. Speak naturally in English or Hindi — AI parses the intent and fills in product fields automatically.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📸</div>
+      <div class="feature-title">OCR Bill Scanning</div>
+      <div class="feature-desc">Photograph any supplier invoice. Tesseract extracts text, Groq AI identifies product names, quantities, and prices — auto-populates inventory.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👆</div>
+      <div class="feature-title">Swipe to Sell / Rent</div>
+      <div class="feature-desc">Swipe any product card left to reveal Sell, Rent, or AI Price buttons. Complete a sale in 3 taps — no complex forms.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⏱️</div>
+      <div class="feature-title">Live Rental Countdown</div>
+      <div class="feature-desc">Real-time countdown timers on rentals, ticking every second. Color-coded urgency from green → amber → red as return date approaches.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">Agentic Chat</div>
+      <div class="feature-desc">Ask "What should I reorder?" and the AI autonomously queries inventory, runs demand forecast, and gives a specific answer — not generic advice.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎨</div>
+      <div class="feature-title">AI Poster Generator</div>
+      <div class="feature-desc">Describe any promotion and get professional poster text instantly. No design skills needed — ready to print or share on WhatsApp.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Smart Dashboard</div>
+      <div class="feature-desc">Real-time stats: total products, low stock count, portfolio value, top seller. AI restock recommendations and 7-day demand forecast updated daily.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔔</div>
+      <div class="feature-title">Festival Insights</div>
+      <div class="feature-desc">AI detects upcoming festivals and proactively suggests which products to stock up — Diwali, Holi, Eid, regional festivals included.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <div class="feature-title">PWA — Installable</div>
+      <div class="feature-desc">Works like a native app on Android and iOS. Add to home screen, service worker caching, no app store required. Works on any phone browser.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SDG ALIGNMENT -->
+<section>
+  <div class="section-label">08 · Impact</div>
+  <h2 class="section-title">SDG alignment</h2>
+  <p class="section-desc">BizBuddy AI directly supports three UN Sustainable Development Goals.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+    <div class="feature-card" style="border-color:rgba(34,197,94,0.3);">
+      <div class="feature-icon">💼</div>
+      <div class="feature-title" style="color:var(--green);">SDG 8 — Decent Work & Economic Growth</div>
+      <div class="feature-desc">Reduces manual workload for small businesses, enabling informed decisions via AI dashboards and chatbots. More time to grow, less time on paperwork.</div>
+    </div>
+    <div class="feature-card" style="border-color:rgba(56,189,248,0.3);">
+      <div class="feature-icon">🏗️</div>
+      <div class="feature-title" style="color:var(--blue);">SDG 9 — Industry, Innovation & Infrastructure</div>
+      <div class="feature-desc">Promotes digital inclusion through offline-first, mobile-friendly design. AI-driven features built for real-world use in low-connectivity environments.</div>
+    </div>
+    <div class="feature-card" style="border-color:rgba(244,114,182,0.3);">
+      <div class="feature-icon">⚖️</div>
+      <div class="feature-title" style="color:var(--pink);">SDG 10 — Reduced Inequalities</div>
+      <div class="feature-desc">Makes enterprise-grade AI tools accessible to small shops via voice input and local language support. SmartBiz Rooms enable peer learning among business owners.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="font-size:0.9rem;color:var(--muted);margin-bottom:8px;">BizBuddy AI — CAUSE2025 · Enterprising City · Team: M.Venkata Charan, B.Anudeep, Pavan</div>
+  <div>React 18 + FastAPI + Groq Llama 3.3 70B + Firebase · 28 endpoints · 15 AI features · 8 agent tools</div>
+</footer>
+
+</body>
+</html>
